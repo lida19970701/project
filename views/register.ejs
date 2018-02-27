@@ -1,0 +1,150 @@
+<script>
+      function subInfo(){
+            if(registerForm.name.value==''){
+              alert('名称不允许空');
+              registerForm.name.focus();
+              return false;
+            }
+            if(registerForm.pwd.value==''){
+              alert('密码不允许空');
+              registerForm.pwd.focus();
+              return false;
+            }
+            if(registerForm.nicheng.value==''){
+              alert('昵称不允许为空');
+              registerForm.nicheng.focus();
+              return false;
+            }
+          }
+    </script>
+<form role="form" id="registerForm" name='registerForm' action='/register' method="post" onsubmit="return subInfo();">
+ <div class="form-group">
+   <label for="name" >名称</label>
+   <input type="text" name='name' class="form-control" id="name" placeholder="请输入名称">
+   <label for="pwd">密码</label>
+   <input type="password" name="pwd" class="form-control" id="pwd" placeholder="请输入密码">
+   <label for="nicheng" >昵称</label>
+   <input type="text" name='nicheng' class="form-control" id="nicheng" placeholder="请输入昵称">
+ </div>
+ <div style="margin-left: 45%">
+    <button type="submit" class="btn btn-default">注册</button>
+ </div>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const app = getApp();
+const recorderManager = wx.getRecorderManager();
+const innerAudioContext = wx.createInnerAudioContext();
+Page({
+  data: {
+    money: "0.00",
+    userInfo: {},
+    hasUserInfo: false,
+    canIUse: wx.canIUse('button.open-type.getUserInfo'),
+  },
+  onLoad: function () {
+    if (app.globalData.userInfo) {
+      this.setData({
+        userInfo: app.globalData.userInfo,
+        hasUserInfo: true
+      })
+    } else if (this.data.canIUse) {
+      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
+      // 所以此处加入 callback 以防止这种情况
+      app.userInfoReadyCallback = res => {
+        this.setData({
+          userInfo: res.userInfo,
+          hasUserInfo: true
+        })
+      }
+    } else {
+      // 在没有 open-type=getUserInfo 版本的兼容处理
+      wx.getUserInfo({
+        success: res => {
+          app.globalData.userInfo = res.userInfo
+          this.setData({
+            userInfo: res.userInfo,
+            hasUserInfo: true
+          })
+        }
+      })
+    }
+  },
+ <!--  bindViewTap:function(){
+    wx.navigateTo({
+      url: '../logs/logs'
+    })
+  }, -->
+  getUserInfo: function (e) {
+    console.log(e)
+    app.globalData.userInfo = e.detail.userInfo
+    this.setData({
+      userInfo: e.detail.userInfo,
+      hasUserInfo: true
+    })
+  },
+  getlocat: function () {
+    wx.authorize({
+      scope: 'scope.record',
+      success() {
+        // 用户已经同意小程序使用录音功能，后续调用 wx.startRecord 接口不会弹窗询问
+        const options = {
+          duration: 590000,
+          sampleRate: 44100,
+          numberOfChannels: 1,
+          encodeBitRate: 192000,
+          format: 'mp3',
+          frameSize: 50
+        }
+        recorderManager.start(options)
+        recorderManager.onStart(() => {
+          console.log('recorder start')
+        })
+        recorderManager.onError((res) => {
+          console.log(res);
+        })
+      }
+    })
+    //  console.log(app)
+  },
+  strop: function () {
+    recorderManager.stop()
+    recorderManager.onStop((res) => {
+      console.log('recorder stop', res)
+      const { tempFilePath } = res
+      console.log(tempFilePath)
+      this.tempFilePath = tempFilePath
+      self = this;
+      console.log(self)
+    })
+  },
+  //播放声音
+  play: function () {
+    innerAudioContext.autoplay = true;
+    innerAudioContext.src = this.tempFilePath;
+    innerAudioContext.onPlay(() => {
+      console.log('开始播放');
+    })
+    innerAudioContext.onError((res) => {
+      console.log(res.errMsg);
+      console.log(res.errCode);
+    })
+  },
+})

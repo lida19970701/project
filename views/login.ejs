@@ -1,0 +1,42 @@
+<script type="text/javascript" src="md5/md5.js"></script>
+<script>
+function subInfo(){
+       // alert(hex_md5("cccc"));
+      
+      if(loginForm.name.value==''){
+        alert('名称不允许空');
+        loginForm.name.focus();
+        return false;
+      }
+      if(loginForm.pwd.value==''){
+        alert('密码不允许空');
+        loginForm.pwd.focus();
+        return false;
+      }
+    }
+function notlog(){
+   location.href='notlog';
+    }
+    function aa(){
+      sEncoded=base64encode((1).toString());
+      alert(sEncoded)
+    }
+    function bb(){
+      sDecoded=base64decode("MQ==");
+      alert(sDecoded)
+    }
+</script>
+<form role="form" id="loginForm" name='loginForm' action='/login' method="post" onsubmit="return subInfo();">
+ <div class="form-group">
+   <label for="name" >名称</label>
+   <input type="text" name='name' class="form-control" id="name" placeholder="请输入名称">
+   <label for="pwd">密码</label>
+   <input type="password" name="pwd" class="form-control" id="pwd" placeholder="请输入密码">
+ <div style="margin-left: 40%">
+ 
+    <button type="submit" class="btn btn-success">登陆</button>
+     <button type="button" onclick="aa()" class="btn btn-success">aa</button>
+     <button type="button" onclick="bb()" class="btn btn-success">bb</button>
+    <button type="button" onclick="notlog()" class="btn btn-danger">无法登陆</button>
+ </div>
+</form>
